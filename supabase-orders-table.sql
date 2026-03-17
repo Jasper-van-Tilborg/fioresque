@@ -13,11 +13,14 @@ create table if not exists public.orders (
   items jsonb not null,
   "totalAmount" integer not null,
   status text not null,
-  "molliePaymentId" text,
+  "stripeSessionId" text,
   "printifyOrderId" text,
   "createdAt" timestamptz not null default now(),
   "updatedAt" timestamptz not null default now()
 );
+
+-- For existing databases that already have the orders table with molliePaymentId, run:
+-- alter table public.orders rename column "molliePaymentId" to "stripeSessionId";
 
 -- Optional: enable RLS and allow service role full access (service role bypasses RLS by default).
 -- alter table public.orders enable row level security;

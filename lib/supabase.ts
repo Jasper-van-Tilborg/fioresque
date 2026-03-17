@@ -32,7 +32,7 @@ export type OrderRow = {
   items: unknown;
   totalAmount: number;
   status: string;
-  molliePaymentId: string | null;
+  stripeSessionId: string | null;
   printifyOrderId: string | null;
   createdAt: string;
   updatedAt: string;

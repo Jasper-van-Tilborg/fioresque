@@ -79,8 +79,8 @@ export default async function AdminOrderDetailPage({
           <h2 className="font-heading font-extrabold text-[#302D2E]">Betaling & Printify</h2>
           <dl className="mt-3 space-y-1 text-sm">
             <div>
-              <dt className="text-[#302D2E]/70">Mollie payment ID</dt>
-              <dd className="font-mono text-[#302D2E]">{order.molliePaymentId ?? "—"}</dd>
+              <dt className="text-[#302D2E]/70">Stripe session ID</dt>
+              <dd className="font-mono text-[#302D2E]">{order.stripeSessionId ?? "—"}</dd>
             </div>
             <div>
               <dt className="text-[#302D2E]/70">Printify order ID</dt>
@@ -140,7 +140,7 @@ type OrderRow = {
   phone: string | null;
   totalAmount: number;
   status: string;
-  molliePaymentId: string | null;
+  stripeSessionId: string | null;
   printifyOrderId: string | null;
   items: unknown;
 };

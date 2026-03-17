@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { getSupabase } from "@/lib/supabase";
-import { PaymentMethod, getMollieClient } from "@/lib/mollie";
+import { getStripe } from "@/lib/stripe";
 import { apiErrorResponse } from "@/lib/errors";
 import { AppError } from "@/lib/errors";
 
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
         items: raw.items,
         totalAmount,
         status: "pending",
-        molliePaymentId: null,
+        stripeSessionId: null,
         printifyOrderId: null,
         updatedAt: now,
       })
@@ -99,27 +99,35 @@ export async function POST(request: NextRequest) {
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-    const mollie = getMollieClient();
-    const payment = await mollie.payments.create({
-      amount: {
-        value: (totalAmount / 100).toFixed(2),
-        currency: "EUR",
-      },
-      description: `Bestelling #${order.id.slice(-8)} – Fioresque Artwear`,
-      redirectUrl: `${baseUrl}/order/${order.id}`,
-      webhookUrl: `${baseUrl}/api/webhooks/mollie`,
+    const stripe = getStripe();
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      payment_method_types: ["ideal", "card"],
+      line_items: [
+        {
+          quantity: 1,
+          price_data: {
+            currency: "eur",
+            unit_amount: totalAmount,
+            product_data: {
+              name: `Bestelling #${order.id.slice(-8)} – Fioresque Artwear`,
+            },
+          },
+        },
+      ],
+      success_url: `${baseUrl}/order/${order.id}`,
+      cancel_url: `${baseUrl}/cart`,
       metadata: { orderId: order.id },
-      method: PaymentMethod.ideal,
     });
 
     await supabase
       .from("orders")
-      .update({ molliePaymentId: payment.id, updatedAt: new Date().toISOString() })
+      .update({ stripeSessionId: session.id, updatedAt: new Date().toISOString() })
       .eq("id", order.id);
 
-    const checkoutUrl = payment.getCheckoutUrl();
+    const checkoutUrl = session.url;
     if (!checkoutUrl) {
-      throw new AppError("Mollie gaf geen checkout-URL terug.", 500);
+      throw new AppError("Geen checkout-URL ontvangen.", 500);
     }
 
     return Response.json({ checkoutUrl, orderId: order.id });

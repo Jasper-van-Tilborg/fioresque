@@ -35,5 +35,9 @@ export async function sendOrderConfirmation(data: OrderConfirmationData): Promis
     `,
   });
 
-  if (error) throw new Error(`Resend error: ${JSON.stringify(error)}`);
+  if (error) {
+    console.error("Resend email failed:", error);
+    // Don't throw: order is already fulfilled (Printify). In Resend test mode you can
+    // only send to your own address; verify a domain at resend.com/domains for production.
+  }
 }

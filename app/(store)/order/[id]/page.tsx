@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSupabase } from "@/lib/supabase";
+import { getStripe } from "@/lib/stripe";
+import { fulfillOrder } from "@/lib/fulfill-order";
 import { Button } from "@/components/ui/button";
 import { ClearCartOnSuccess } from "@/components/order/clear-cart-on-success";
 
@@ -32,20 +34,39 @@ export default async function OrderConfirmationPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  let order: { id: string; totalAmount: number; email: string } | null = null;
-  try {
-    const supabase = getSupabase();
-    const { data } = await supabase
-      .from("orders")
-      .select("id, totalAmount, email")
-      .eq("id", id)
-      .single();
-    order = data;
-  } catch {
-    order = null;
-  }
+  const supabase = getSupabase();
+  const { data: order, error } = await supabase
+    .from("orders")
+    .select("id, totalAmount, email, status, stripeSessionId, firstName, lastName, address, city, postalCode, country, phone, items")
+    .eq("id", id)
+    .single();
 
-  if (!order) notFound();
+  if (error || !order) notFound();
+
+  // If order is still pending and we have a Stripe session, verify payment and fulfill
+  if (order.status === "pending" && order.stripeSessionId) {
+    try {
+      const stripe = getStripe();
+      const session = await stripe.checkout.sessions.retrieve(order.stripeSessionId);
+      if (session.payment_status === "paid") {
+        await fulfillOrder({
+          id: order.id,
+          email: order.email,
+          firstName: order.firstName,
+          lastName: order.lastName,
+          address: order.address,
+          city: order.city,
+          postalCode: order.postalCode,
+          country: order.country,
+          phone: order.phone,
+          items: order.items,
+          totalAmount: order.totalAmount,
+        });
+      }
+    } catch (err) {
+      console.error("Order fulfillment on success page failed:", err);
+    }
+  }
 
   const shortId = order.id.slice(-8);
   const totalEur = (order.totalAmount / 100).toFixed(2);
