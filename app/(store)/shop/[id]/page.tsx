@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { fetchPrintifyProduct } from "@/lib/printify";
+import { isProductHidden } from "@/lib/hidden-products";
 import { AddToCart } from "@/components/product/add-to-cart";
 import type { ProductVariant } from "@/lib/product-utils";
 
@@ -31,6 +32,9 @@ export default async function ProductPage({
 
   const product = await fetchPrintifyProduct(shopId, id);
   if (!product) notFound();
+
+  const hidden = await isProductHidden(id);
+  if (hidden) notFound();
 
   const imageUrl =
     product.images?.length > 0 ? (product.images[0] as { src: string }).src : null;

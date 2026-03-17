@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { fetchPrintifyProducts } from "@/lib/printify";
+import { getHiddenProductIds } from "@/lib/hidden-products";
 import { ProductGrid } from "@/components/product/product-grid";
 import { ShopFilters } from "@/components/shop/shop-filters";
 
@@ -22,16 +23,19 @@ export default async function ShopPage({
   let products: { id: string; title: string; price: number; imageUrl: string | null }[] = [];
   try {
     const shopId = process.env.PRINTIFY_SHOP_ID;
+    const hiddenIds = await getHiddenProductIds();
     if (shopId) {
       const data = await fetchPrintifyProducts(shopId, 1, 100);
-      products = data.data.map((p) => {
-        const price =
-          p.variants?.length > 0
-            ? Math.min(...p.variants.map((v) => Math.round((v.price ?? 0) * 100)))
-            : 0;
-        const imageUrl = p.images?.length > 0 ? (p.images[0] as { src: string }).src : null;
-        return { id: p.id, title: p.title, price, imageUrl };
-      });
+      products = data.data
+        .filter((p) => !hiddenIds.has(p.id))
+        .map((p) => {
+          const price =
+            p.variants?.length > 0
+              ? Math.min(...p.variants.map((v) => Math.round((v.price ?? 0) * 100)))
+              : 0;
+          const imageUrl = p.images?.length > 0 ? (p.images[0] as { src: string }).src : null;
+          return { id: p.id, title: p.title, price, imageUrl };
+        });
       const minPrice = minPriceParam != null && !Number.isNaN(minPriceParam) ? minPriceParam * 100 : null;
       const maxPrice = maxPriceParam != null && !Number.isNaN(maxPriceParam) ? maxPriceParam * 100 : null;
       if (minPrice != null) products = products.filter((p) => p.price >= minPrice);

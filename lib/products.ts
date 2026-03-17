@@ -1,4 +1,5 @@
 import { fetchPrintifyProducts } from "@/lib/printify";
+import { getHiddenProductIds } from "@/lib/hidden-products";
 
 export type FeaturedProduct = {
   id: string;
@@ -11,8 +12,10 @@ export async function getFeaturedProducts(limit = 6): Promise<FeaturedProduct[]>
   try {
     const shopId = process.env.PRINTIFY_SHOP_ID;
     if (!shopId) return [];
-    const data = await fetchPrintifyProducts(shopId, 1, limit);
-    return data.data.map((p) => {
+    const hiddenIds = await getHiddenProductIds();
+    const data = await fetchPrintifyProducts(shopId, 1, 50);
+    const filtered = data.data.filter((p) => !hiddenIds.has(p.id));
+    return filtered.slice(0, limit).map((p) => {
       const minPrice =
         p.variants?.length > 0
           ? Math.min(...p.variants.map((v) => Math.round((v.price ?? 0) * 100)))
