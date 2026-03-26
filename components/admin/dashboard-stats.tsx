@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -23,6 +24,9 @@ export function DashboardStats({
   byStatus,
   revenueLast7Days,
 }: Props) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const revenueEur = (totalRevenue / 100).toFixed(2);
   const chartData = revenueLast7Days.map(({ date, revenue }) => ({
     date: new Date(date).toLocaleDateString("nl-NL", { day: "numeric", month: "short" }),
@@ -52,15 +56,19 @@ export function DashboardStats({
             Omzet afgelopen 7 dagen
           </h2>
           <div className="mt-4 h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#302D2E/10" />
-                <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `€${v}`} />
-                <Tooltip formatter={(v) => [typeof v === "number" ? `€ ${v.toFixed(2)}` : v, "Omzet"]} />
-                <Bar dataKey="revenue" fill="#5E825F" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {mounted ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#302D2E/10" />
+                  <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                  <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `€${v}`} />
+                  <Tooltip formatter={(v) => [typeof v === "number" ? `€ ${v.toFixed(2)}` : v, "Omzet"]} />
+                  <Bar dataKey="revenue" fill="#5E825F" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full w-full animate-pulse bg-[#302D2E]/5" />
+            )}
           </div>
         </div>
         <div className="rounded-lg border border-[#302D2E]/10 bg-white p-4">
