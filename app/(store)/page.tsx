@@ -33,7 +33,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="bg-primary py-12 md:py-24">
+      <section className="bg-primary py-16 md:py-28">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="flex items-end justify-between">
             <h2 className="font-heading text-[22px] font-bold text-secondary md:text-[2.2rem]">
@@ -47,12 +47,12 @@ export default async function HomePage() {
           {featured.length > 0 ? (
             <>
               <MobileSummerCarousel products={featured.slice(0, 3)} />
-              <div className="mt-9 hidden md:block">
+              <div className="mt-12 hidden md:block">
                 <ProductGrid products={featured.slice(0, 3)} priorityFirst={3} />
               </div>
             </>
           ) : (
-            <p className="mt-8 max-w-3xl text-base leading-7 text-secondary/80 md:text-lg md:leading-8">
+            <p className="mt-10 max-w-3xl text-base leading-7 text-secondary/80 md:text-lg md:leading-8">
               Binnenkort vind je hier onze producten. Zet PRINTIFY_SHOP_ID in je .env om producten te tonen.
             </p>
           )}
@@ -61,7 +61,7 @@ export default async function HomePage() {
 
       <section className="bg-secondary py-12 md:py-24">
         <div className="mx-auto grid max-w-6xl gap-8 px-4 sm:px-6 md:grid-cols-2 md:gap-12">
-          <div>
+          <div className="md:flex md:min-h-[420px] md:flex-col">
             <p className="text-[10px] tracking-widest text-accent md:text-sm md:tracking-[0.18em]">OUR STORY</p>
             <h3 className="mt-2 font-heading text-[22px] font-extrabold tracking-[0.08em] text-primary md:mt-4 md:text-5xl">
               Fioresque
@@ -97,14 +97,18 @@ export default async function HomePage() {
                 </div>
               </div>
             </div>
-            <p className="mt-5 max-w-lg text-[13px] leading-6 tracking-[0.03em] text-primary/85 md:mt-8 md:text-base md:leading-8 md:tracking-[0.04em]">
+            <p className="mt-5 max-w-lg text-[14px] leading-7 tracking-[0.03em] text-primary/85 md:mt-8 md:text-[17px] md:leading-8 md:tracking-[0.04em]">
               Fioresque started as something personal. A shared love for clothing that
               doesn&apos;t shout. No logos, no hype. Just clean pieces inspired by nature,
               designed to last. We believe what you wear should feel like you: effortless,
               timeless, yours.
             </p>
-            <Link href="/over-ons" className="mt-6 inline-block md:mt-12">
-              <Button size="md" variant="secondary" className="px-8 py-2 text-[13px] tracking-[0.08em] md:px-10">
+            <Link href="/over-ons" className="mt-6 inline-block md:mt-auto md:pt-12">
+              <Button
+                size="md"
+                variant="secondary"
+                className="min-h-11 px-7 py-2 text-[13px] tracking-[0.08em] md:px-10 md:py-3 md:text-base"
+              >
                 READ OUR STORY
               </Button>
             </Link>

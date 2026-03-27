@@ -48,3 +48,78 @@ body::-webkit-scrollbar {
 .font-heading {
   font-family: var(--font-heading), var(--font-body), system-ui, sans-serif;
 }
+
+@keyframes mobile-menu-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mobile-menu-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes mobile-search-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mobile-search-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+.mobile-menu-enter {
+  animation: mobile-menu-enter 220ms ease-out both;
+}
+
+.mobile-menu-exit {
+  animation: mobile-menu-exit 220ms ease-in both;
+}
+
+.mobile-search-enter {
+  animation: mobile-search-enter 220ms ease-out both;
+}
+
+.mobile-search-exit {
+  animation: mobile-search-exit 220ms ease-in both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-menu-enter {
+    animation: none;
+  }
+  .mobile-menu-exit {
+    animation: none;
+  }
+  .mobile-search-enter {
+    animation: none;
+  }
+  .mobile-search-exit {
+    animation: none;
+  }
+}
