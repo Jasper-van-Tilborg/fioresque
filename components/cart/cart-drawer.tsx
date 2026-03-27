@@ -71,7 +71,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
         role="dialog"
         aria-modal="true"
         aria-label="Winkelwagen"
-        className={`absolute right-0 top-0 flex h-full w-full max-w-[360px] flex-col border-l border-secondary/20 bg-primary text-secondary shadow-2xl transition-transform duration-300 ease-out sm:max-w-[430px] lg:max-w-[480px] ${
+        className={`absolute right-0 top-0 flex h-full w-full max-w-full flex-col border-l-0 bg-primary text-secondary shadow-2xl transition-transform duration-300 ease-out md:max-w-[430px] md:border-l md:border-secondary/20 lg:max-w-[480px] ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
       >
