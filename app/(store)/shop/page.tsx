@@ -4,7 +4,7 @@ import { getHiddenProductIds } from "@/lib/hidden-products";
 import { ProductGrid } from "@/components/product/product-grid";
 import { ShopFilters } from "@/components/shop/shop-filters";
 
-type SearchParams = { category?: string; minPrice?: string; maxPrice?: string };
+type SearchParams = { category?: string; minPrice?: string; maxPrice?: string; q?: string };
 
 export const metadata = {
   title: "Shop – Fioresque Artwear",
@@ -17,6 +17,7 @@ export default async function ShopPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
+  const query = params.q?.trim().toLowerCase() ?? "";
   const minPriceParam = params.minPrice ? Number(params.minPrice) : undefined;
   const maxPriceParam = params.maxPrice ? Number(params.maxPrice) : undefined;
 
@@ -38,6 +39,7 @@ export default async function ShopPage({
         });
       const minPrice = minPriceParam != null && !Number.isNaN(minPriceParam) ? minPriceParam * 100 : null;
       const maxPrice = maxPriceParam != null && !Number.isNaN(maxPriceParam) ? maxPriceParam * 100 : null;
+      if (query) products = products.filter((p) => p.title.toLowerCase().includes(query));
       if (minPrice != null) products = products.filter((p) => p.price >= minPrice);
       if (maxPrice != null) products = products.filter((p) => p.price <= maxPrice);
     }

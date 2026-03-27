@@ -3,7 +3,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cart-store";
+import { CartDrawer } from "@/components/cart/cart-drawer";
 
 function HeaderIcon({
   children,
@@ -15,7 +17,7 @@ function HeaderIcon({
   return (
     <span
       aria-label={label}
-      className="inline-flex size-11 items-center justify-center rounded-full text-secondary/90 transition hover:bg-secondary/10 hover:text-secondary md:size-9"
+      className="inline-flex size-12 items-center justify-center border border-transparent text-secondary/90 transition hover:border-secondary/30 hover:bg-secondary/10 hover:text-secondary md:size-10"
     >
       {children}
     </span>
@@ -26,7 +28,23 @@ export function Header() {
   const count = useCartStore((s) => s.getCount());
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [desktopSearchOpen, setDesktopSearchOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const pathname = usePathname();
+  const router = useRouter();
   useEffect(() => setMounted(true), []);
+
+  const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const query = searchQuery.trim();
+    if (!query) {
+      router.push("/shop");
+      return;
+    }
+    router.push(`/shop?q=${encodeURIComponent(query)}`);
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b-2 border-secondary bg-primary/95 backdrop-blur">
@@ -34,19 +52,31 @@ export function Header() {
         <nav className="flex items-center gap-9" aria-label="Hoofdnavigatie">
           <Link
             href="/shop"
-            className="font-heading text-sm tracking-[0.15em] text-secondary/90 transition hover:text-secondary"
+            className={`relative font-heading text-sm tracking-[0.15em] text-secondary/90 transition hover:text-secondary after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:bg-secondary after:transition-all after:duration-200 ${
+              pathname.startsWith("/shop")
+                ? "after:w-full"
+                : "after:w-0 hover:after:w-full"
+            }`}
           >
             SHOP
           </Link>
           <Link
             href="/shop"
-            className="font-heading text-sm tracking-[0.15em] text-secondary/90 transition hover:text-secondary"
+            className={`relative font-heading text-sm tracking-[0.15em] text-secondary/90 transition hover:text-secondary after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:bg-secondary after:transition-all after:duration-200 ${
+              pathname.startsWith("/shop")
+                ? "after:w-full"
+                : "after:w-0 hover:after:w-full"
+            }`}
           >
             COLLECTIONS
           </Link>
           <Link
             href="/over-ons"
-            className="font-heading text-sm tracking-[0.15em] text-secondary/90 transition hover:text-secondary"
+            className={`relative font-heading text-sm tracking-[0.15em] text-secondary/90 transition hover:text-secondary after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:bg-secondary after:transition-all after:duration-200 ${
+              pathname === "/over-ons"
+                ? "after:w-full"
+                : "after:w-0 hover:after:w-full"
+            }`}
           >
             ABOUT US
           </Link>
@@ -64,36 +94,54 @@ export function Header() {
         </Link>
 
         <nav className="flex items-center gap-3" aria-label="Gebruikersacties">
-          <Link href="#" aria-label="Zoeken">
+          <form
+            onSubmit={handleSearchSubmit}
+            className={`overflow-hidden border border-secondary/40 transition-all duration-200 ${
+              desktopSearchOpen ? "w-56 opacity-100" : "w-0 border-transparent opacity-0"
+            }`}
+          >
+            <input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Zoek product..."
+              className="h-9 w-full bg-primary px-3 text-sm text-secondary placeholder:text-secondary/50 focus:outline-none"
+            />
+          </form>
+          <button
+            type="button"
+            aria-label="Zoeken"
+            onClick={() => setDesktopSearchOpen((v) => !v)}
+          >
             <HeaderIcon label="Zoeken">
-              <svg viewBox="0 0 24 24" className="size-[17px]" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg viewBox="0 0 24 24" className="size-[19px]" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="11" cy="11" r="7" />
                 <path d="m20 20-3.5-3.5" />
               </svg>
             </HeaderIcon>
-          </Link>
+          </button>
           <Link href="#" aria-label="Favorieten">
             <HeaderIcon label="Favorieten">
-              <svg viewBox="0 0 24 24" className="size-[17px]" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg viewBox="0 0 24 24" className="size-[19px]" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="m12 20-1.2-1.1C6 14.6 3 11.8 3 8.3A4.3 4.3 0 0 1 7.3 4C9 4 10.7 4.8 12 6.1 13.3 4.8 15 4 16.7 4A4.3 4.3 0 0 1 21 8.3c0 3.5-3 6.3-7.8 10.6z" />
               </svg>
             </HeaderIcon>
           </Link>
           <Link href="#" aria-label="Profiel">
             <HeaderIcon label="Profiel">
-              <svg viewBox="0 0 24 24" className="size-[17px]" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg viewBox="0 0 24 24" className="size-[19px]" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="12" cy="8" r="3.5" />
                 <path d="M5 20a7 7 0 0 1 14 0" />
               </svg>
             </HeaderIcon>
           </Link>
-          <Link
-            href="/cart"
+          <button
+            type="button"
+            onClick={() => setCartDrawerOpen(true)}
             className="relative inline-flex items-center"
             aria-label={mounted && count > 0 ? `Winkelwagen, ${count} items` : "Winkelwagen"}
           >
             <HeaderIcon label="Winkelwagen">
-              <svg viewBox="0 0 24 24" className="size-[17px]" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg viewBox="0 0 24 24" className="size-[19px]" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M6 7h12l-1.5 11h-9z" />
                 <path d="M9 7V6a3 3 0 0 1 6 0v1" />
               </svg>
@@ -103,7 +151,7 @@ export function Header() {
                 {count}
               </span>
             )}
-          </Link>
+          </button>
         </nav>
       </div>
 
@@ -135,21 +183,26 @@ export function Header() {
           </Link>
 
           <div className="flex items-center gap-1">
-            <Link href="#" aria-label="Zoeken">
+            <button
+              type="button"
+              aria-label="Zoeken"
+              onClick={() => setMobileSearchOpen((v) => !v)}
+            >
               <HeaderIcon label="Zoeken">
-                <svg viewBox="0 0 24 24" className="size-[17px]" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg viewBox="0 0 24 24" className="size-[19px]" fill="none" stroke="currentColor" strokeWidth="2">
                   <circle cx="11" cy="11" r="7" />
                   <path d="m20 20-3.5-3.5" />
                 </svg>
               </HeaderIcon>
-            </Link>
-            <Link
-              href="/cart"
+            </button>
+            <button
+              type="button"
+              onClick={() => setCartDrawerOpen(true)}
               className="relative inline-flex items-center"
               aria-label={mounted && count > 0 ? `Winkelwagen, ${count} items` : "Winkelwagen"}
             >
               <HeaderIcon label="Winkelwagen">
-                <svg viewBox="0 0 24 24" className="size-[17px]" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg viewBox="0 0 24 24" className="size-[19px]" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M6 7h12l-1.5 11h-9z" />
                   <path d="M9 7V6a3 3 0 0 1 6 0v1" />
                 </svg>
@@ -159,9 +212,20 @@ export function Header() {
                   {count}
                 </span>
               )}
-            </Link>
+            </button>
           </div>
         </div>
+
+        {mobileSearchOpen && (
+          <form onSubmit={handleSearchSubmit} className="border-t border-secondary/30 bg-primary px-5 py-3">
+            <input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Zoek product..."
+              className="h-11 w-full border border-secondary/40 bg-primary px-3 text-sm text-secondary placeholder:text-secondary/50 focus:outline-none"
+            />
+          </form>
+        )}
 
         {mobileMenuOpen && (
           <nav className="border-t border-secondary/30 bg-primary px-5 py-4" aria-label="Mobiele navigatie">
@@ -179,6 +243,7 @@ export function Header() {
           </nav>
         )}
       </div>
+      <CartDrawer open={cartDrawerOpen} onClose={() => setCartDrawerOpen(false)} />
     </header>
   );
 }

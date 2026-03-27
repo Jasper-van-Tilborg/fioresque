@@ -25,6 +25,26 @@ body {
   line-height: 1.5;
 }
 
+html,
+body {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
 .font-heading {
   font-family: var(--font-heading), var(--font-body), system-ui, sans-serif;
 }

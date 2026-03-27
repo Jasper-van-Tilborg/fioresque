@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
         },
       ],
       success_url: `${baseUrl}/order/${order.id}`,
-      cancel_url: `${baseUrl}/cart`,
+      cancel_url: `${baseUrl}/shop`,
       metadata: { orderId: order.id },
     });
 
