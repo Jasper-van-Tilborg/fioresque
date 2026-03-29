@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import {
   BarChart,
   Bar,
@@ -24,8 +24,11 @@ export function DashboardStats({
   byStatus,
   revenueLast7Days,
 }: Props) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
 
   const revenueEur = (totalRevenue / 100).toFixed(2);
   const chartData = revenueLast7Days.map(({ date, revenue }) => ({

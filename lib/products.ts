@@ -1,11 +1,13 @@
 import { fetchPrintifyProducts } from "@/lib/printify";
 import { getHiddenProductIds } from "@/lib/hidden-products";
+import { mapPrintifyToShopProduct } from "@/lib/shop-product-mapper";
 
 export type FeaturedProduct = {
   id: string;
   title: string;
   price: number;
   imageUrl: string | null;
+  isNew: boolean;
 };
 
 export async function getFeaturedProducts(limit = 6): Promise<FeaturedProduct[]> {
@@ -16,17 +18,13 @@ export async function getFeaturedProducts(limit = 6): Promise<FeaturedProduct[]>
     const data = await fetchPrintifyProducts(shopId, 1, 50);
     const filtered = data.data.filter((p) => !hiddenIds.has(p.id));
     return filtered.slice(0, limit).map((p) => {
-      const minPrice =
-        p.variants?.length > 0
-          ? Math.min(...p.variants.map((v) => Math.round((v.price ?? 0) * 100)))
-          : 0;
-      const imageUrl =
-        p.images?.length > 0 ? (p.images[0] as { src: string }).src : null;
+      const sp = mapPrintifyToShopProduct(p);
       return {
-        id: p.id,
-        title: p.title,
-        price: minPrice,
-        imageUrl,
+        id: sp.id,
+        title: sp.title,
+        price: sp.price,
+        imageUrl: sp.imageUrl,
+        isNew: sp.isNew,
       };
     });
   } catch {

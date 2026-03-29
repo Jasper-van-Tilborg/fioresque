@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 
 const primary = "#302D2E";
 const secondary = "#FAF9F6";
-const accent = "#5E825F";
 
 const nav = [
   { href: "/admin/dashboard", label: "Dashboard" },

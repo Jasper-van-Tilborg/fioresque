@@ -39,6 +39,7 @@ export function MobileSummerCarousel({ products }: MobileSummerCarouselProps) {
               price={p.price}
               imageUrl={p.imageUrl}
               priority={i === 0}
+              isNew={p.isNew}
             />
           </div>
         ))}

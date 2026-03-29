@@ -18,7 +18,7 @@ const FROM_EMAIL_FALLBACK = "onboarding@resend.dev";
 
 export async function sendOrderConfirmation(data: OrderConfirmationData): Promise<void> {
   const resend = getResendClient();
-  const from = process.env.RESEND_FROM_EMAIL ?? FROM_EMAIL_FALLBACK;
+  const from = process.env.RESEND_FROM_EMAIL ?? FROM_EMAIL ?? FROM_EMAIL_FALLBACK;
   const totalEur = (data.totalAmountCents / 100).toFixed(2);
 
   const { error } = await resend.emails.send({

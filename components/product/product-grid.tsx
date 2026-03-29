@@ -5,6 +5,7 @@ export type ProductGridProduct = {
   title: string;
   price: number;
   imageUrl: string | null;
+  isNew?: boolean;
 };
 
 type ProductGridProps = {
@@ -23,6 +24,7 @@ export function ProductGrid({ products, priorityFirst = 0 }: ProductGridProps) {
           price={p.price}
           imageUrl={p.imageUrl}
           priority={i < priorityFirst}
+          isNew={p.isNew}
         />
       ))}
     </div>

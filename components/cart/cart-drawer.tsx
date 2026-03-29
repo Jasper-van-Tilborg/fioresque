@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
@@ -17,17 +17,15 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
   const items = useCartStore((s) => s.items);
   const total = useCartStore((s) => s.getTotal());
   const count = useCartStore((s) => s.getCount());
-  const [hydrated, setHydrated] = useState(false);
-  const [portalReady, setPortalReady] = useState(false);
+  const isClient = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
   const totalEur = (total / 100).toFixed(2);
-  const visibleItems = hydrated ? items : [];
-  const visibleCount = hydrated ? count : 0;
-  const visibleTotalEur = hydrated ? totalEur : "0.00";
-
-  useEffect(() => {
-    setHydrated(true);
-    setPortalReady(true);
-  }, []);
+  const visibleItems = isClient ? items : [];
+  const visibleCount = isClient ? count : 0;
+  const visibleTotalEur = isClient ? totalEur : "0.00";
 
   useEffect(() => {
     if (!open) return;
@@ -156,6 +154,6 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
     </div>
   );
 
-  if (!portalReady) return null;
+  if (!isClient) return null;
   return createPortal(drawerContent, document.body);
 }
